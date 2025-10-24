@@ -2,9 +2,9 @@ import { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { registerUser } from '../features/auth/authSlice'
 import { useNavigate } from 'react-router-dom'
-import Input from '../components/ui/Input'
-import Button from '../components/ui/Button'
-import Card from '../components/ui/Card'
+import { Input } from '@/components/ui/Input'
+import { Button } from '@/components/ui/Button'
+import { Card } from '@/components/ui/Card'
 
 const Signup = () => {
   const dispatch = useDispatch()

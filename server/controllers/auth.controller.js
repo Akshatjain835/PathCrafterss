@@ -116,3 +116,61 @@ export const logoutUserController = (req, res) => {
     message: "Logged out successfully!",
   });
 };
+
+
+export const getUserProfile = async (req, res) => {
+  try {
+    const {id: userId} = req.user;
+    const user = await User.findById(userId).select("-password");
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "Profile not found",
+      });
+    }
+    return res.status(200).json({
+      success: true,
+      user,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      success: false,
+      message: "Failed to load user.",
+    });
+  }
+};
+
+export const updateProfile = async (req, res) => {
+  try {
+    const {id: userId} = req.user;
+    const { username, location, phone } = req.body;
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+    
+
+    
+
+    const updatedData = { username, location, phone };
+    const updatedUser = await User.findByIdAndUpdate(userId, updatedData, {
+      new: true,
+    }).select("-password");
+
+    return res.status(200).json({
+      success: true,
+      message: "Profile Updated Successfully!",
+      user: updatedUser,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      success: false,
+      message: "Failed to Update Profile.",
+    });
+  }
+};

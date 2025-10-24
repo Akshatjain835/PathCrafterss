@@ -44,6 +44,30 @@ export const fetchMe = createAsyncThunk('auth/me', async (_, { rejectWithValue }
   }
 })
 
+export const getProfile = createAsyncThunk(
+  "auth/getProfile",
+  async (_, { rejectWithValue }) => {
+    try {
+      const res = await authAPI.getProfile();
+      return res.data;
+    } catch (err) {
+      return rejectWithValue(err.response?.data || { message: err.message });
+    }
+  }
+);
+
+export const updateProfile = createAsyncThunk(
+  "auth/updateProfile",
+  async (editData, { rejectWithValue }) => {
+    try {
+      const res = await authAPI.updateProfile(editData);
+      return res.data;
+    } catch (err) {
+      return rejectWithValue(err.response?.data || { message: err.message });
+    }
+  }
+);
+
 const authSlice = createSlice({
   name: 'auth',
   initialState,
