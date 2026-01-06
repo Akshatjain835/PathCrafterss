@@ -6,6 +6,7 @@ import Signup from '../pages/Signup'
 import Dashboard from '../pages/Dashboard'
 import { Profile } from '@/pages/Profile'
 import CityPage from '../pages/City'
+import TripPage from '../pages/TripPage'
 import AttractionDetail from '../pages/AttractionDetail'
 
 const AppRoutes = () => {
@@ -17,6 +18,7 @@ const AppRoutes = () => {
       <Route path="/dashboard" element={<Dashboard />} />
       <Route path="/profile" element={<Profile />} />
       <Route path="/city/:city" element={<CityPage />} />
+      <Route path="/trip/:tripId" element={<TripPage />} />
       <Route path="/city/:city/:locationId" element={<AttractionDetail />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

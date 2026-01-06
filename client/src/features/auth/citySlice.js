@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
-const UNSPLASH_ACCESS_KEY = "uiT3beeGW_hfajflronXUdTuQNQsGP2lacdikKg0TEE"; 
+const UNSPLASH_ACCESS_KEY = import.meta.env.VITE_UNSPLASH_ACCESS_KEY; 
 
 const initialState = {
   info: null,
@@ -43,7 +43,7 @@ export const fetchCityAttractions = createAsyncThunk(
   "city/fetchAttractions",
   async (city, { rejectWithValue }) => {
     try {
-        const RAPIDAPI_KEY = "47df44a313msh99baf3110b907f8p12029djsnc8b04820603f";
+        const RAPIDAPI_KEY = import.meta.env.VITE_RAPIDAPI_KEY;
         
       const options = {
         method: "GET",
@@ -83,7 +83,7 @@ export const fetchCityAttractions = createAsyncThunk(
 //     try {
 //       console.log("locationId ", locationId);
       
-//       const RAPIDAPI_KEY = "47df44a313msh99baf3110b907f8p12029djsnc8b04820603f";
+//       const RAPIDAPI_KEY = import.meta.env.VITE_RAPIDAPI_KEY;
 
 //       const options = {
 //         method: "GET",
@@ -115,7 +115,7 @@ export const fetchAttractionDetail = createAsyncThunk(
   async (locationId, { rejectWithValue }) => {
     try {
       // Security Warning: It's highly recommended to move this key to a .env.local file!
-      const RAPIDAPI_KEY = "47df44a313msh99baf3110b907f8p12029djsnc8b04820603f";
+      const RAPIDAPI_KEY = import.meta.env.VITE_RAPIDAPI_KEY;
 
       const options = {
         method: "GET",
