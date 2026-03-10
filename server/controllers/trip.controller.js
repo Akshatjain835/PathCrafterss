@@ -174,3 +174,16 @@ export const saveTrip = async (req, res) => {
 };
 
 
+export const deleteTrip = async (req, res) => {
+  try {
+    const trip = await Trip.findByIdAndDelete(req.params.id);
+
+    if (!trip) {
+      return res.status(404).json({ message: "Trip not found" });
+    }
+
+    res.json({ message: "Trip deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};

@@ -61,7 +61,7 @@ const Header = () => {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search city..."
-            className="border rounded-lg px-3 py-1 w-60"
+            className="border rounded-lg px-3 py-1 w-80"
           />
           {suggestions.length > 0 && (
             <ul className="absolute bg-white border rounded-lg shadow-md mt-1 w-60 z-50">

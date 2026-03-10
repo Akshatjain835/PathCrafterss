@@ -6,7 +6,8 @@ import {
   getExploreData,
   getAttractionDetail,
   getUserTrips,
-  saveTrip
+  saveTrip,
+  deleteTrip
 } from "../controllers/trip.controller.js";
 import authTrip from "../models/auth.trip.js";
 import authMiddleware from "../middlewares/auth.middleware.js";
@@ -19,5 +20,5 @@ router.get("/:tripId/explore", getExploreData);
 router.get("/:tripId/attraction/:locationId", getAttractionDetail);
 router.get("/", authMiddleware, getUserTrips);
 router.put("/:tripId/save", authMiddleware, saveTrip);
-
+router.delete("/:id", authMiddleware, deleteTrip);
 export default router;

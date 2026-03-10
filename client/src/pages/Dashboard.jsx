@@ -1,12 +1,21 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "@/features/auth/authAPI";
-import { MapPin } from "lucide-react";
+import { MapPin, Trash2 } from "lucide-react";
 
 const Dashboard = () => {
   const [trips, setTrips] = useState([]);
   const navigate = useNavigate();
 
+  const deleteTrip = async (id) => {
+  try {
+    await api.delete(`/api/trips/${id}`);
+
+    setTrips((prev) => prev.filter((trip) => trip._id !== id));
+  } catch (err) {
+    console.error(err);
+  }
+};
   useEffect(() => {
     const fetchTrips = async () => {
       try {
@@ -29,30 +38,41 @@ const Dashboard = () => {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {trips.map((trip) => (
-            <div
-              key={trip._id}
-              onClick={() => navigate(`/trip/${trip._id}`)}
-              className="cursor-pointer bg-white rounded-xl shadow hover:shadow-lg transition overflow-hidden"
-            >
-              <div className="h-40 bg-sky-100 flex items-center justify-center">
-                <MapPin size={40} className="text-sky-600" />
-              </div>
+  <div
+    key={trip._id}
+    onClick={() => navigate(`/trip/${trip._id}`)}
+    className="cursor-pointer bg-white rounded-xl shadow hover:shadow-lg transition overflow-hidden relative"
+  >
+    {/* Delete Icon */}
+    <button
+      onClick={(e) => {
+        e.stopPropagation();
+        deleteTrip(trip._id);
+      }}
+      className="absolute top-3 right-3 bg-white p-2 rounded-full shadow hover:bg-red-100"
+    >
+      <Trash2 size={18} className="text-red-500" />
+    </button>
 
-              <div className="p-4">
-                <h2 className="text-xl font-semibold">
-                  {trip.title || `Trip to ${trip.destination.city}`}
-                </h2>
+    <div className="h-40 bg-sky-100 flex items-center justify-center">
+      <MapPin size={40} className="text-sky-600" />
+    </div>
 
-                <p className="text-gray-500 text-sm">
-                  {trip.destination.city}, {trip.destination.country}
-                </p>
+    <div className="p-4">
+      <h2 className="text-xl font-semibold">
+        {trip.title || `Trip to ${trip.destination.city}`}
+      </h2>
 
-                <p className="text-xs text-gray-400 mt-2">
-                  {trip.days?.length || 0} days planned
-                </p>
-              </div>
-            </div>
-          ))}
+      <p className="text-gray-500 text-sm">
+        {trip.destination.city}, {trip.destination.country}
+      </p>
+
+      <p className="text-xs text-gray-400 mt-2">
+        {trip.days?.length || 0} days planned
+      </p>
+    </div>
+  </div>
+))}
         </div>
       )}
     </div>

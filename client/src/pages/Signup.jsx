@@ -39,7 +39,7 @@ const Signup = () => {
               <div className="hidden lg:block">
                 <div className="relative h-72 rounded-lg overflow-hidden shadow-md">
                   <img
-                    src="/src/assets/hero.jpg"
+                    src="/src/assets/travel.avif"
                     alt="Hero"
                     className="object-cover w-full h-full"
                   />

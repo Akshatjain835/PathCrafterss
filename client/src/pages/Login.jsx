@@ -33,7 +33,7 @@ const Login = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
               <div className="hidden lg:block">
                 <div className="relative h-72 rounded-lg overflow-hidden shadow-md">
-                  <img src="/src/assets/hero.jpg" alt="Hero" className="object-cover w-full h-full" />
+                  <img src="/src/assets/travel.avif" alt="Hero" className="object-cover w-full h-full" />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
                 </div>
                 <h3 className="mt-4 text-lg font-medium">Design your routes</h3>
