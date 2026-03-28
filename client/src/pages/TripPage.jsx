@@ -79,6 +79,7 @@ const TripPage = () => {
           <ItineraryBuilder
             days={trip.days}
             setDays={(days) => setTrip((prev) => ({ ...prev, days }))}
+            trip={trip}
           />
         </section>
 
