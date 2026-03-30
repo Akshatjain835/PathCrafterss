@@ -17,19 +17,15 @@ const TYPE_STYLES = {
 };
 const typeStyle = (type) => TYPE_STYLES[type] || TYPE_STYLES.sightseeing;
 
-// ─── MAIN COMPONENT ───────────────────────────────────────────────────────────
 const ItineraryBuilder = ({ days, setDays, trip }) => {
-  // manual activity state
   const [newActivity, setNewActivity] = useState({ dayIndex: null, name: "", time: "", type: "sightseeing" });
   const [collapsed, setCollapsed]     = useState({});
 
-  // AI modal state
   const [showAIForm, setShowAIForm]   = useState(false);
   const [aiNumDays, setAiNumDays]     = useState("");
   const [aiBudget, setAiBudget]       = useState(trip?.budget?.total || "");
   const [aiLoading, setAiLoading]     = useState(false);
 
-  // ── manual helpers ──────────────────────────────────────────────────────────
   const addDay = () => {
     setDays([...days, { dayNumber: days.length + 1, activities: [] }]);
     toast.success("Day added to itinerary");
@@ -72,7 +68,6 @@ const ItineraryBuilder = ({ days, setDays, trip }) => {
       )
     );
 
-  // ── AI generate ─────────────────────────────────────────────────────────────
   const handleGenerate = async () => {
     if (!aiNumDays || Number(aiNumDays) < 1) { toast.error("Please enter a valid number of days."); return; }
 
@@ -97,15 +92,12 @@ const ItineraryBuilder = ({ days, setDays, trip }) => {
     }
   };
 
-  // ── render ──────────────────────────────────────────────────────────────────
   return (
     <div className="p-4 border-t">
 
-      {/* ── Header row ── */}
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-xl font-semibold">Itinerary</h2>
         <div className="flex gap-2">
-          {/* AI button */}
           <Button
             onClick={() => setShowAIForm((v) => !v)}
             className="flex items-center gap-1.5 px-4 py-1.5 bg-violet-600 text-white rounded-3xl hover:bg-violet-800 text-sm"
@@ -114,7 +106,6 @@ const ItineraryBuilder = ({ days, setDays, trip }) => {
             Generate with AI
           </Button>
 
-          {/* Manual add day */}
           <Button
             onClick={() => { addDay(); }}
             className="px-3 py-1 bg-sky-600 text-white rounded-3xl hover:bg-sky-800"
@@ -124,10 +115,8 @@ const ItineraryBuilder = ({ days, setDays, trip }) => {
         </div>
       </div>
 
-      {/* ── AI inline form ── */}
       {showAIForm && (
         <div className="mb-5 border border-violet-200 rounded-2xl bg-violet-50 p-5 relative">
-          {/* close */}
           <button
             onClick={() => setShowAIForm(false)}
             className="absolute top-3 right-3 text-gray-400 hover:text-gray-600"
@@ -142,7 +131,6 @@ const ItineraryBuilder = ({ days, setDays, trip }) => {
           </div>
 
           <div className="flex flex-wrap gap-4 items-end">
-            {/* Number of days */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Number of Days</label>
               <input
@@ -156,7 +144,6 @@ const ItineraryBuilder = ({ days, setDays, trip }) => {
               />
             </div>
 
-            {/* Budget */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Budget (₹)</label>
               <input
@@ -168,7 +155,6 @@ const ItineraryBuilder = ({ days, setDays, trip }) => {
               />
             </div>
 
-            {/* Generate */}
             <Button
               onClick={handleGenerate}
               disabled={aiLoading}
@@ -187,7 +173,6 @@ const ItineraryBuilder = ({ days, setDays, trip }) => {
         </div>
       )}
 
-      {/* ── Days list ── */}
       <div className="space-y-4">
         {days.length === 0 && (
           <p className="text-gray-400 text-sm text-center py-8 border-2 border-dashed rounded-xl">
@@ -200,7 +185,6 @@ const ItineraryBuilder = ({ days, setDays, trip }) => {
           return (
             <div key={day.dayNumber} className="border rounded-lg bg-white shadow-sm overflow-hidden">
 
-              {/* Day header */}
               <div className="flex justify-between items-center px-4 py-3 bg-gray-50 border-b">
                 <button
                   onClick={() => toggleCollapse(day.dayNumber)}
@@ -231,7 +215,6 @@ const ItineraryBuilder = ({ days, setDays, trip }) => {
 
               {!isCollapsed && (
                 <div className="p-4 space-y-3">
-                  {/* Add activity inline form */}
                   {newActivity.dayIndex === dayIndex && (
                     <div className="flex flex-wrap gap-2 p-3 bg-sky-50 rounded-lg border border-sky-200">
                       <input
