@@ -7,6 +7,9 @@ import TouristAttractions from "./TouristAttraction";
 import { useNavigate } from "react-router-dom";
 import { createTrip } from "@/features/auth/authTrip";
 import { toast } from "sonner";
+import BestTimeToVisit from '../components/BestTimeToVisit';
+
+
 
 const CityPage = () => {
   const { city } = useParams();
@@ -61,6 +64,11 @@ const CityPage = () => {
               </>
             )}
           </div>
+        </div>
+        <div>
+          <BestTimeToVisit
+            destination={city} 
+          />
         </div>
         <div>
           <TouristAttractions city={city} />
