@@ -7,8 +7,11 @@ import TouristAttractions from "./TouristAttraction";
 import { useNavigate } from "react-router-dom";
 import { createTrip } from "@/features/auth/authTrip";
 import { toast } from "sonner";
+
 import BestTimeToVisit from '../components/BestTimeToVisit';
 
+
+import PlacesSection from "@/components/PlacesStation";
 
 
 const CityPage = () => {
@@ -72,6 +75,9 @@ const CityPage = () => {
         </div>
         <div>
           <TouristAttractions city={city} />
+        </div>
+        <div>
+          <PlacesSection city={city} />
         </div>
       </div>
       <button

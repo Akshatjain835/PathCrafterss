@@ -110,6 +110,40 @@ export const fetchCityAttractions = createAsyncThunk(
 //     }
 //   }
 // );
+// ─── Restaurants ─────────────────────────────────────────────────────────────
+const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+
+export const fetchCityRestaurants = createAsyncThunk(
+  "city/fetchRestaurants",
+  async (city, { rejectWithValue }) => {
+    try {
+      const res = await axios.get(
+        `${BASE_URL}/api/city/${encodeURIComponent(city)}/restaurants?limit=9`,
+        { withCredentials: true }
+      );
+      return res.data.data;
+    } catch (err) {
+      return rejectWithValue(err?.response?.data?.message || "Failed to load restaurants.");
+    }
+  }
+);
+
+// ─── Hotels ──────────────────────────────────────────────────────────────────
+export const fetchCityHotels = createAsyncThunk(
+  "city/fetchHotels",
+  async (city, { rejectWithValue }) => {
+    try {
+      const res = await axios.get(
+        `${BASE_URL}/api/city/${encodeURIComponent(city)}/hotels?limit=9`,
+        { withCredentials: true }
+      );
+      return res.data.data;
+    } catch (err) {
+      return rejectWithValue(err?.response?.data?.message || "Failed to load hotels.");
+    }
+  }
+);
+
 export const fetchAttractionDetail = createAsyncThunk(
   "city/fetchAttractionDetails",
   async (locationId, { rejectWithValue }) => {
