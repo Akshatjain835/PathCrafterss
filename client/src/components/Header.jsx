@@ -42,7 +42,7 @@ const Header = () => {
           console.warn("Rate limit reached — slow down requests.");
         else console.error("Error fetching cities:", err);
       }
-    }, 200); // wait 500ms after last key press
+    }, 1000); // wait 1000ms after last key press to avoid rate limiting
 
     return () => clearTimeout(fetchCities);
   }, [query]);

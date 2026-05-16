@@ -6,8 +6,9 @@ import ImageSlideshow from "../components/SlideShow";
 import TouristAttractions from "./TouristAttraction";
 import { createTrip } from "@/features/auth/authTrip";
 import { toast } from "sonner";
-import BestTimeToVisit from "../components/BestTimeToVisit";
-import ReviewSection from "@/components/ReviewSection";
+import BestTimeToVisit from '../components/BestTimeToVisit';
+
+
 
 const CityPage = () => {
   const { city } = useParams();
@@ -123,27 +124,18 @@ const CityPage = () => {
             )}
           </div>
         </div>
-      </section>
-
-      {/* Climate Data Section */}
-      <section className="bg-gray-50 p-6 rounded-3xl">
-        <h2 className="text-2xl font-bold mb-4 px-2">Best Time to Visit</h2>
-        <BestTimeToVisit destination={city} />
-      </section>
-
-      {/* Attractions Section */}
-      <section>
-        <h2 className="text-2xl font-bold mb-6 px-2">
-          Top Tourist Attractions
-        </h2>
-        <TouristAttractions city={city} />
-      </section>
-
-      {/* Review Section with Reference Hook */}
-      <section
-        ref={reviewRef}
-        id="reviews"
-        className="pt-10 border-t border-gray-100"
+        <div>
+          <BestTimeToVisit
+            destination={city} 
+          />
+        </div>
+        <div>
+          <TouristAttractions city={city} />
+        </div>
+      </div>
+      <button
+        onClick={handlePlanTrip}
+        className="mt-6 px-4 py-2 bg-sky-600 text-white rounded-md"
       >
         <ReviewSection cityId={city} />
       </section>
