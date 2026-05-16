@@ -25,11 +25,8 @@ const tripSchema = new mongoose.Schema(
       city: String,
       country: String,
     },
-
-    dates: {
-      startDate: Date,
-      endDate: Date,
-    },
+    startDate: Date,
+    endDate: Date,
 
     days: [daySchema], // itinerary
 

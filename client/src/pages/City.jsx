@@ -1,23 +1,46 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchCityInfo, fetchCityImages } from "../features/auth/citySlice";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom"; // Added useLocation
 import ImageSlideshow from "../components/SlideShow";
 import TouristAttractions from "./TouristAttraction";
-import { useNavigate } from "react-router-dom";
 import { createTrip } from "@/features/auth/authTrip";
 import { toast } from "sonner";
-import BestTimeToVisit from '../components/BestTimeToVisit';
-
-
+import BestTimeToVisit from "../components/BestTimeToVisit";
+import ReviewSection from "@/components/ReviewSection";
 
 const CityPage = () => {
   const { city } = useParams();
-  const user = useSelector((state) => state.auth.user);
+  const location = useLocation(); // Hook to access URL parameters
+  const navigate = useNavigate();
   const dispatch = useDispatch();
+
+  const user = useSelector((state) => state.auth.user);
   const { info, images, loading, error } = useSelector((s) => s.city);
 
-  const navigate = useNavigate();
+  // Reference for the Review Section to allow auto-scrolling
+  const reviewRef = useRef(null);
+
+  useEffect(() => {
+    dispatch(fetchCityInfo(city));
+    dispatch(fetchCityImages(city));
+  }, [city, dispatch]);
+
+  // Logic to check if user was redirected here to add a review
+  useEffect(() => {
+    const searchParams = new URLSearchParams(location.search);
+    const shouldReview = searchParams.get("review");
+
+    if (shouldReview === "true" && reviewRef.current) {
+      // Small timeout to ensure the component is fully rendered before scrolling
+      setTimeout(() => {
+        reviewRef.current.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
+      }, 500);
+    }
+  }, [location.search, loading]);
 
   const handlePlanTrip = async () => {
     if (!user) {
@@ -36,50 +59,94 @@ const CityPage = () => {
       navigate(`/trip/${res.data.tripId}`);
     } catch (err) {
       console.error("Failed to create trip", err);
+      toast.error("Could not create trip. Please try again.");
     }
   };
-  useEffect(() => {
-    dispatch(fetchCityInfo(city));
-    dispatch(fetchCityImages(city));
-  }, [city, dispatch]);
 
-  if (loading) return <p>Loading...</p>;
-  if (error) return <p className="text-red-600">{error}</p>;
+  if (loading)
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <p className="animate-pulse text-sky-600 font-medium">
+          Loading {city}...
+        </p>
+      </div>
+    );
+
+  if (error)
+    return (
+      <div className="p-10 text-center">
+        <p className="text-red-600 font-bold">Error: {error}</p>
+        <button
+          onClick={() => navigate(-1)}
+          className="mt-4 text-sky-600 underline"
+        >
+          Go Back
+        </button>
+      </div>
+    );
 
   return (
-    <div className="p-4">
-      <div>
-        <div className="flex flex-col md:flex-row gap-4">
-          {/* --- Left Column --- */}
-          <div className="md:w-1/2">
-            {images?.length > 0 ? <ImageSlideshow images={images} /> : null}
+    <div className="max-w-7xl mx-auto p-4 space-y-10">
+      <section>
+        <div className="flex flex-col md:flex-row gap-8">
+          {/* --- Left Column: Visuals --- */}
+          <div className="md:w-1/2 rounded-2xl overflow-hidden shadow-lg">
+            {images?.length > 0 ? (
+              <ImageSlideshow images={images} />
+            ) : (
+              <div className="h-64 bg-gray-100 flex items-center justify-center text-gray-400">
+                No images available
+              </div>
+            )}
           </div>
 
-          {/* --- Right Column --- */}
-          <div className="md:w-1/2">
+          {/* --- Right Column: Info --- */}
+          <div className="md:w-1/2 flex flex-col justify-center">
             {info && (
               <>
-                <h1 className="text-2xl font-bold">{info.title}</h1>
-                <p className="mt-2">{info.extract}</p>
+                <h1 className="text-4xl font-extrabold text-gray-900 mb-4">
+                  {info.title}
+                </h1>
+                <p className="text-gray-600 leading-relaxed text-lg">
+                  {info.extract}
+                </p>
+
+                <div className="mt-8">
+                  <button
+                    onClick={handlePlanTrip}
+                    className="px-8 py-3 bg-sky-600 hover:bg-sky-700 text-white font-bold rounded-xl shadow-lg transition-all hover:scale-105 active:scale-95"
+                  >
+                    Start Planning a Trip
+                  </button>
+                </div>
               </>
             )}
           </div>
         </div>
-        <div>
-          <BestTimeToVisit
-            destination={city} 
-          />
-        </div>
-        <div>
-          <TouristAttractions city={city} />
-        </div>
-      </div>
-      <button
-        onClick={handlePlanTrip}
-        className="mt-6 px-4 py-2 bg-sky-600 text-white rounded-md"
+      </section>
+
+      {/* Climate Data Section */}
+      <section className="bg-gray-50 p-6 rounded-3xl">
+        <h2 className="text-2xl font-bold mb-4 px-2">Best Time to Visit</h2>
+        <BestTimeToVisit destination={city} />
+      </section>
+
+      {/* Attractions Section */}
+      <section>
+        <h2 className="text-2xl font-bold mb-6 px-2">
+          Top Tourist Attractions
+        </h2>
+        <TouristAttractions city={city} />
+      </section>
+
+      {/* Review Section with Reference Hook */}
+      <section
+        ref={reviewRef}
+        id="reviews"
+        className="pt-10 border-t border-gray-100"
       >
-        Plan Trip
-      </button>
+        <ReviewSection cityId={city} />
+      </section>
     </div>
   );
 };

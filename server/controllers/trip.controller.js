@@ -8,7 +8,6 @@ const RAPIDAPI_HOST = "travel-advisor.p.rapidapi.com";
 export const createTrip = async (req, res) => {
   try {
     const { destination } = req.body;
-
     const trip = await Trip.create({
       title: `Trip to ${destination.city}`,
       destination,
@@ -40,10 +39,13 @@ export const getExploreData = async (req, res) => {
     const { city } = trip.destination;
 
     // ---- Unsplash: city image fallback ----
-    const unsplashRes = await axios.get("https://api.unsplash.com/search/photos", {
-      params: { query: city, per_page: 1 },
-      headers: { Authorization: `Client-ID ${UNSPLASH_KEY}` },
-    });
+    const unsplashRes = await axios.get(
+      "https://api.unsplash.com/search/photos",
+      {
+        params: { query: city, per_page: 1 },
+        headers: { Authorization: `Client-ID ${UNSPLASH_KEY}` },
+      },
+    );
     const cityImage = unsplashRes.data.results[0]?.urls?.regular;
 
     // ---- RapidAPI: attractions ----
@@ -59,16 +61,18 @@ export const getExploreData = async (req, res) => {
 
     const response = await axios.request(options);
 
-    const attractions = response.data?.data?.Typeahead_autocomplete?.results?.map(
-      (item) => ({
+    const attractions =
+      response.data?.data?.Typeahead_autocomplete?.results?.map((item) => ({
         id: item?.details?.location_id || item?.location_id,
         name: item?.details?.name || item?.name,
         description: item?.details?.subcategory?.name || "No description",
         lat: item?.details?.latitude || 0,
         lng: item?.details?.longitude || 0,
-        image: item?.details?.photo?.images?.large?.url || cityImage || "https://via.placeholder.com/400",
-      })
-    ) || [];
+        image:
+          item?.details?.photo?.images?.large?.url ||
+          cityImage ||
+          "https://via.placeholder.com/400",
+      })) || [];
 
     res.json(attractions);
   } catch (err) {
@@ -76,7 +80,6 @@ export const getExploreData = async (req, res) => {
     res.status(500).json({ message: "Failed to fetch attractions" });
   }
 };
-
 
 export const getAttractionDetail = async (req, res) => {
   try {
@@ -99,8 +102,10 @@ export const getAttractionDetail = async (req, res) => {
       id: data.location_id,
       name: data.name,
       description: data.subcategory?.name || "No description",
-      address: data.address_obj?.street || data.address_obj?.city || "No address",
-      image: data.photo?.images?.large?.url || "https://via.placeholder.com/400",
+      address:
+        data.address_obj?.street || data.address_obj?.city || "No address",
+      image:
+        data.photo?.images?.large?.url || "https://via.placeholder.com/400",
       rating: data.rating,
       num_reviews: data.num_reviews,
       lat: data.latitude,
@@ -122,7 +127,7 @@ export const addActivity = async (req, res) => {
     const trip = await Trip.findById(tripId);
     if (!trip) return res.status(404).json({ message: "Trip not found" });
 
-    let day = trip.days.find(d => d.dayNumber === dayNumber);
+    let day = trip.days.find((d) => d.dayNumber === dayNumber);
     if (!day) {
       day = { dayNumber, activities: [] };
       trip.days.push(day);
@@ -140,8 +145,9 @@ export const addActivity = async (req, res) => {
 
 export const getUserTrips = async (req, res) => {
   try {
-    const trips = await Trip.find({ userId: req.user.id, isSaved: true })
-      .sort({ updatedAt: -1 });
+    const trips = await Trip.find({ userId: req.user.id, isSaved: true }).sort({
+      updatedAt: -1,
+    });
 
     res.json(trips);
   } catch (err) {
@@ -154,12 +160,11 @@ export const saveTrip = async (req, res) => {
     const trip = await Trip.findOneAndUpdate(
       { _id: req.params.tripId, userId: req.user.id },
       {
-        ...req.body,   
+        ...req.body,
         isSaved: true,
       },
-      { new: true }
+      { new: true },
     );
-
     if (!trip) {
       return res
         .status(404)
@@ -172,7 +177,6 @@ export const saveTrip = async (req, res) => {
     res.status(500).json({ message: "Failed to save trip" });
   }
 };
-
 
 export const deleteTrip = async (req, res) => {
   try {

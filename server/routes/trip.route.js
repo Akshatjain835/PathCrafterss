@@ -7,7 +7,7 @@ import {
   getAttractionDetail,
   getUserTrips,
   saveTrip,
-  deleteTrip
+  deleteTrip,
 } from "../controllers/trip.controller.js";
 import authTrip from "../models/auth.trip.js";
 import authMiddleware from "../middlewares/auth.middleware.js";

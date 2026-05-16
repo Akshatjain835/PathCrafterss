@@ -16,19 +16,23 @@ const TripPage = () => {
 
   useEffect(() => {
     const fetchTrip = async () => {
-      const res = await api.get(`/api/trips/${tripId}`);
+      try {
+        const res = await api.get(`/api/trips/${tripId}`);
+        //console.log("Fetched Data:", res.data); // Look closely at the keys here!
 
-      setTrip({
-        ...res.data,
-        days: res.data.days || [],
-        notes: res.data.notes || "",
-        budget: res.data.budget || {
-          total: 0,
-          expenses: [],
-        },
-      });
+        setTrip({
+          ...res.data,
+          // Fallback to null or empty string if keys don't exist yet
+          startDate: res.data.startDate || null,
+          endDate: res.data.endDate || null,
+          days: res.data.days || [],
+          notes: res.data.notes || "",
+          budget: res.data.budget || { total: 0, expenses: [] },
+        });
+      } catch (err) {
+        console.error(err);
+      }
     };
-
     fetchTrip();
   }, [tripId]);
 
@@ -37,7 +41,7 @@ const TripPage = () => {
       toast.error("Add at least one day to itinerary");
       return;
     }
-
+    console.log("Saving trip", trip);
     try {
       await api.put(`/api/trips/${tripId}/save`, {
         days: trip.days,
@@ -65,8 +69,15 @@ const TripPage = () => {
           <TripHeader
             trip={trip}
             onSave={handleSaveTrip}
-            onDatesChange={(dates) =>
-              setTrip((prev) => ({ ...prev, ...dates }))
+            onDatesChange={(dates) => {
+              setTrip((prev) => ({
+                ...prev,
+                // Force the keys to match your DB/State naming
+                startDate: dates.startDate || dates.from || dates.start,
+                endDate: dates.endDate || dates.to || dates.end,
+              }))
+              console.log("yo",trip)
+            }
             }
           />
         </section>

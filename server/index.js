@@ -8,7 +8,7 @@ import tripRoutes from "./routes/trip.route.js";
 import aiRoutes from "./routes/ai.route.js";
 import climateRouter from "./routes/climate.route.js";
 import "./cron/refreshClimate.js";  
-
+import reviewRoutes from "./routes/review.route.js";
 dotenv.config();
 
 const app = express();
@@ -36,6 +36,7 @@ app.use("/api/auth", authRouter);
 app.use("/api/trips", tripRoutes);
 app.use("/api/ai", aiRoutes);
 app.use("/api/climate", climateRouter);
+app.use("/api/reviews", reviewRoutes);
 // test route
 app.get("/", (req, res) => {
   res.send("Server is running 🚀");
