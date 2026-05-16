@@ -1,3 +1,4 @@
+import crypto from "crypto";
 import Trip from "../models/auth.trip.js";
 import axios from "axios";
 
@@ -189,5 +190,52 @@ export const deleteTrip = async (req, res) => {
     res.json({ message: "Trip deleted successfully" });
   } catch (error) {
     res.status(500).json({ error: error.message });
+  }
+};
+
+// ========================= SHARE TRIP =========================
+export const shareTrip = async (req, res) => {
+  try {
+    const trip = await Trip.findOne({ _id: req.params.tripId, userId: req.user.id });
+    if (!trip) return res.status(404).json({ message: "Trip not found or unauthorized" });
+
+    // Generate a unique token if not already shared
+    if (!trip.shareToken) {
+      trip.shareToken = crypto.randomBytes(16).toString("hex");
+    }
+    trip.isPublic = true;
+    await trip.save();
+
+    const shareUrl = `${process.env.FRONTEND_URL || "http://localhost:5173"}/shared/${trip.shareToken}`;
+    return res.json({ shareUrl, shareToken: trip.shareToken });
+  } catch (err) {
+    console.error("shareTrip error:", err.message);
+    res.status(500).json({ message: "Failed to generate share link" });
+  }
+};
+
+// ========================= UNSHARE TRIP =========================
+export const unshareTrip = async (req, res) => {
+  try {
+    const trip = await Trip.findOneAndUpdate(
+      { _id: req.params.tripId, userId: req.user.id },
+      { isPublic: false, shareToken: null },
+      { new: true }
+    );
+    if (!trip) return res.status(404).json({ message: "Trip not found" });
+    return res.json({ message: "Trip is now private" });
+  } catch (err) {
+    res.status(500).json({ message: "Failed to unshare trip" });
+  }
+};
+
+// ========================= GET SHARED TRIP (public, no auth) =========================
+export const getSharedTrip = async (req, res) => {
+  try {
+    const trip = await Trip.findOne({ shareToken: req.params.token, isPublic: true });
+    if (!trip) return res.status(404).json({ message: "Trip not found or link has expired" });
+    return res.json(trip);
+  } catch (err) {
+    res.status(500).json({ message: "Failed to load shared trip" });
   }
 };

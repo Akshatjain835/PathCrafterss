@@ -1,11 +1,12 @@
 import { useState } from "react";
 
 const items = [
-  { id: "overview", label: "Overview" },
-  { id: "explore", label: "Explore" },
-  { id: "itinerary", label: "Itinerary" },
-  { id: "budget", label: "Budget" },
-  { id: "notes", label: "Notes" },
+  { id: "overview",  label: "Overview",  emoji: "🗺️" },
+  { id: "explore",   label: "Explore",   emoji: "🔍" },
+  { id: "itinerary", label: "Itinerary", emoji: "📅" },
+  { id: "budget",    label: "Budget",    emoji: "💰" },
+  { id: "notes",     label: "Notes",     emoji: "📝" },
+  { id: "packing",   label: "Packing",   emoji: "🎒" },
 ];
 
 const Sidebar = () => {
@@ -33,7 +34,7 @@ const Sidebar = () => {
                   : "text-gray-700 hover:bg-gray-100"
               }`}
           >
-            {item.label}
+            {item.emoji} {item.label}
           </li>
         ))}
       </ul>

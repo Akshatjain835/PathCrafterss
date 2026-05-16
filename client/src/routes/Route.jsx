@@ -8,6 +8,7 @@ import { Profile } from '@/pages/Profile'
 import CityPage from '../pages/City'
 import TripPage from '../pages/TripPage'
 import AttractionDetail from '../pages/AttractionDetail'
+import SharedTrip from '../pages/SharedTrip'
 
 const AppRoutes = () => {
   return (
@@ -20,6 +21,7 @@ const AppRoutes = () => {
       <Route path="/city/:city" element={<CityPage />} />
       <Route path="/trip/:tripId" element={<TripPage />} />
       <Route path="/city/:city/:locationId" element={<AttractionDetail />} />
+      <Route path="/shared/:token" element={<SharedTrip />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );

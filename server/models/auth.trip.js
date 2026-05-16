@@ -42,7 +42,16 @@ const tripSchema = new mongoose.Schema(
     notes: String,
     isSaved: {
       type: Boolean,
-      default: false, 
+      default: false,
+    },
+    isPublic: {
+      type: Boolean,
+      default: false,
+    },
+    shareToken: {
+      type: String,
+      unique: true,
+      sparse: true, // null for private trips, unique token for shared ones
     },
   },
   { timestamps: true }

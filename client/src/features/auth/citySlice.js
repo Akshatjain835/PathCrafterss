@@ -43,33 +43,13 @@ export const fetchCityAttractions = createAsyncThunk(
   "city/fetchAttractions",
   async (city, { rejectWithValue }) => {
     try {
-        const RAPIDAPI_KEY = import.meta.env.VITE_RAPIDAPI_KEY;
-        
-      const options = {
-        method: "GET",
-        url: "https://travel-advisor.p.rapidapi.com/locations/search",
-        params: {
-          query: `tourist attractions in ${city}`,
-          limit: "6", // Get 6 attractions
-          sort: "relevance",
-          lang: "en_US",
-        },
-        headers: {
-          "X-RapidAPI-Key": RAPIDAPI_KEY,
-          "X-RapidAPI-Host": "travel-advisor.p.rapidapi.com",
-        },
-      };
-
-      const response = await axios.request(options);
-
-      const attractions = response.data.data.filter(
-        (item) =>
-          item.result_type === "things_to_do" &&
-          item.result_object?.name &&
-          item.result_object?.photo
+      // ✅ Calls backend proxy — keeps API key server-side, no rate limit from browser
+      const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5001";
+      const res = await axios.get(
+        `${BASE_URL}/api/city/${encodeURIComponent(city)}/attractions`,
+        { withCredentials: true }
       );
-
-      return attractions.map((item) => item.result_object);
+      return res.data.data;
     } catch (error) {
       console.error("Error fetching attractions:", error.response);
       return rejectWithValue("Failed to load attractions.");

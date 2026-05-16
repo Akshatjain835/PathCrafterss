@@ -7,6 +7,7 @@ import Sidebar from "./tripPlanning/Sidebar";
 import TripHeader from "./tripPlanning/TripHeader";
 import BudgetSection from "./tripPlanning/BudgetSection";
 import NotesSection from "./tripPlanning/NotesSection";
+import PackingList from "./tripPlanning/PackingList";
 import api from "@/features/auth/authAPI";
 import { toast } from "sonner";
 
@@ -106,6 +107,10 @@ const TripPage = () => {
             notes={trip.notes}
             setNotes={(notes) => setTrip((prev) => ({ ...prev, notes }))}
           />
+        </section>
+
+        <section id="packing">
+          <PackingList trip={trip} />
         </section>
       </div>
 

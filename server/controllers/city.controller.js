@@ -86,3 +86,30 @@ export const getCityHotels = async (req, res) => {
     return res.status(500).json({ message: err.message || "Failed to fetch hotels" });
   }
 };
+
+// ─── GET /api/city/:city/attractions ─────────────────────────────────────────
+export const getCityAttractions = async (req, res) => {
+  try {
+    const { city } = req.params;
+    const RAPIDAPI_KEY  = process.env.RAPIDAPI_KEY;
+    const RAPIDAPI_HOST = "travel-advisor.p.rapidapi.com";
+
+    const response = await axios.get(
+      `https://${RAPIDAPI_HOST}/locations/search`,
+      {
+        params: { query: `tourist attractions in ${city}`, limit: "9", sort: "relevance", lang: "en_US" },
+        headers: { "X-RapidAPI-Key": RAPIDAPI_KEY, "X-RapidAPI-Host": RAPIDAPI_HOST },
+      }
+    );
+
+    const raw = response.data?.data || [];
+    const attractions = raw
+      .filter((item) => item.result_type === "things_to_do" && item.result_object?.name && item.result_object?.photo)
+      .map((item) => item.result_object);
+
+    return res.json({ data: attractions });
+  } catch (err) {
+    console.error("getCityAttractions error:", err?.response?.status, err?.response?.data || err.message);
+    return res.status(500).json({ message: "Failed to fetch attractions" });
+  }
+};
