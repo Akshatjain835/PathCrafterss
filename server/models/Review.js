@@ -11,4 +11,6 @@ const reviewSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now },
 });
 
+reviewSchema.index({ userId: 1, cityId: 1 }, { unique: true });
+
 export default mongoose.model("Review", reviewSchema);

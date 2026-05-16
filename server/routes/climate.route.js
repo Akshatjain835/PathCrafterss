@@ -31,22 +31,7 @@ router.get("/:destination", async (req, res) => {
           });
       }
     }
-
-    // If user has selected trip dates, give them a direct tip
-    // let planningTip = null;
-    // if (month) {
-    //   const m = doc.months.find((m) => m.month === parseInt(month));
-    //   if (m) {
-    //     planningTip =
-    //       m.score >= 75
-    //         ? "✓ Great time to visit!"
-    //         : m.score >= 55
-    //           ? "⚠ Decent time — check warnings."
-    //           : "✗ Consider rescheduling.";
-    //   }
-      // }
-    // console.log(destination);
-     console.log(doc);
+    
     res.json({
       destination: doc.destination,
       country: doc.country,

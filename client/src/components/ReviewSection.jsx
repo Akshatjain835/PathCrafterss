@@ -20,6 +20,7 @@ export default function ReviewSection({ cityId }) {
         `http://localhost:5001/api/reviews/${cityId}`,
       );
       setReviews(res.data);
+      console.log("revies are: ", res.data);
     } catch (err) {
       console.error("Error fetching reviews", err);
     } finally {
@@ -35,23 +36,37 @@ export default function ReviewSection({ cityId }) {
     }
 
     setIsSubmitting(true);
+
     try {
       const res = await axios.post(
         `http://localhost:5001/api/reviews/${cityId}`,
         {
           rating,
           comment,
-          userName: "Guest User", // Replace with actual logged-in user data
           tags: rating > 3 ? ["Recommended"] : ["Mixed Feelings"],
         },
+        {
+          withCredentials: true,
+        },
       );
+      console.log("Review posted:", res.data);
+      // Build safe review object for instant UI update
+      const newReview = {
+        ...res.data,
+        userName: res.data.userName || res.data.user?.name || "You",
+        createdAt: res.data.createdAt || new Date().toISOString(),
+      };
 
-      // Update UI locally
-      setReviews([res.data, ...reviews]);
+      // Instant UI update
+      setReviews((prev) => [newReview, ...prev]);
+
+      // Reset form
       setComment("");
       setRating(0);
     } catch (err) {
-      alert("Failed to post review");
+      console.log(err);
+
+      alert(err.response?.data?.message || "Failed to post review");
     } finally {
       setIsSubmitting(false);
     }
