@@ -8,12 +8,9 @@ import tripRoutes from "./routes/trip.route.js";
 import aiRoutes from "./routes/ai.route.js";
 import climateRouter from "./routes/climate.route.js";
 import "./cron/refreshClimate.js";  
-<<<<<<< HEAD
 import reviewRoutes from "./routes/review.route.js";
-=======
 import cityRoutes from "./routes/city.route.js";
 
->>>>>>> 718facd27cfbbc911daae8a81df01c9ccda2ce91
 dotenv.config();
 
 const app = express();
@@ -40,14 +37,10 @@ app.use(cors({
 app.use("/api/auth", authRouter);
 app.use("/api/trips", tripRoutes);
 app.use("/api/ai", aiRoutes);
-
-app.use("/api/climate", climateRouter);
-<<<<<<< HEAD
 app.use("/api/reviews", reviewRoutes);
-=======
+app.use("/api/climate", climateRouter);
 app.use("/api/city", cityRoutes);
 
->>>>>>> 718facd27cfbbc911daae8a81df01c9ccda2ce91
 // test route
 app.get("/", (req, res) => {
   res.send("Server is running 🚀");

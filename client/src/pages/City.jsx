@@ -1,18 +1,17 @@
 import React, { useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchCityInfo, fetchCityImages } from "../features/auth/citySlice";
-import { useParams, useNavigate, useLocation } from "react-router-dom"; // Added useLocation
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import ImageSlideshow from "../components/SlideShow";
 import TouristAttractions from "./TouristAttraction";
 import { createTrip } from "@/features/auth/authTrip";
 import { toast } from "sonner";
-import BestTimeToVisit from '../components/BestTimeToVisit';
-
-
+import BestTimeToVisit from "../components/BestTimeToVisit";
+import ReviewSection from "@/components/ReviewSection";
 
 const CityPage = () => {
   const { city } = useParams();
-  const location = useLocation(); // Hook to access URL parameters
+  const location = useLocation();
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -33,7 +32,6 @@ const CityPage = () => {
     const shouldReview = searchParams.get("review");
 
     if (shouldReview === "true" && reviewRef.current) {
-      // Small timeout to ensure the component is fully rendered before scrolling
       setTimeout(() => {
         reviewRef.current.scrollIntoView({
           behavior: "smooth",
@@ -88,6 +86,7 @@ const CityPage = () => {
 
   return (
     <div className="max-w-7xl mx-auto p-4 space-y-10">
+      {/* --- Top Section: Main Info & Visuals --- */}
       <section>
         <div className="flex flex-col md:flex-row gap-8">
           {/* --- Left Column: Visuals --- */}
@@ -124,19 +123,22 @@ const CityPage = () => {
             )}
           </div>
         </div>
-        <div>
-          <BestTimeToVisit
-            destination={city} 
-          />
-        </div>
-        <div>
-          <TouristAttractions city={city} />
-        </div>
-      </div>
-      <button
-        onClick={handlePlanTrip}
-        className="mt-6 px-4 py-2 bg-sky-600 text-white rounded-md"
-      >
+      </section>
+
+      {/* --- Climate Section --- */}
+      <section className="bg-gray-50 p-4 rounded-2xl">
+        <h2 className="text-xl font-bold mb-4 px-1">Best Time to Visit</h2>
+        <BestTimeToVisit destination={city} />
+      </section>
+
+      {/* --- Attractions Section --- */}
+      <section>
+        <h2 className="text-xl font-bold mb-4 px-1">Top Tourist Attractions</h2>
+        <TouristAttractions city={city} />
+      </section>
+
+      {/* --- Review Section --- */}
+      <section ref={reviewRef} className="pt-8 border-t border-gray-100">
         <ReviewSection cityId={city} />
       </section>
     </div>
