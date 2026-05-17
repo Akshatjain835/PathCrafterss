@@ -77,6 +77,7 @@ async function fetchCrowdData(destinationName) {
       `https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article/en.wikipedia/all-access/all-agents/${wikiName}/monthly/${year}0101/${year}1201`,
       { headers: { "User-Agent": "PathCrafters/1.0" } },
     );
+    console.log
     const views = res.data.items.map((item) => item.views);
     const maxViews = Math.max(...views);
     const minViews = Math.min(...views);

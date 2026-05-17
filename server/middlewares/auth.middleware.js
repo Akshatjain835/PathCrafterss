@@ -6,7 +6,7 @@ export const authMiddleware = (req, res, next) => {
     const authHeader = req.headers["authorization"];
     const cookieToken = req.cookies?.token;
     const headerToken = req.headers["x-access-token"];
-console.log("in auth")
+//console.log("in auth")
     let token = null;
 
     if (authHeader && authHeader.startsWith("Bearer ")) {
@@ -16,11 +16,11 @@ console.log("in auth")
     } else if (headerToken) {
       token = headerToken;
     }
-console.log("after token extraction:", token);
+//console.log("after token extraction:", token);
     if (!token) {
       return res.status(401).json({ message: "No token provided" });
     }
-console.log("after token get:", token);
+//console.log("after token get:", token);
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     // attach minimal user info to the request
     req.user = { id: decoded.id, role: decoded.role };

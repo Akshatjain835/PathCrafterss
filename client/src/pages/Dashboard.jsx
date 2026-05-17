@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "@/features/auth/authAPI";
-import { MapPin, Trash2, X, Star, Clock } from "lucide-react";
+import { MapPin, Trash2, X, Star, Clock, Sparkles } from "lucide-react";
 
 const GENRES = [
   {
@@ -203,48 +203,29 @@ const Dashboard = () => {
   const [activeGenre, setActiveGenre] = useState(null);
   const navigate = useNavigate();
 
+  // 🚨 AI Recommendations States
+  const [recs, setRecs] = useState([]);
+  const [recsLoading, setRecsLoading] = useState(true);
+  const [fallback, setFallback] = useState(false);
+
   // Helper to accurately determine trip status relative to today
   const getTripStatus = (startDate, endDate) => {
-    // Missing dates
-    if (!startDate || !endDate) {
-      return "UPCOMING";
-    }
+    if (!startDate || !endDate) return "UPCOMING";
 
     try {
-      // Normalize today's date
       const today = new Date();
       today.setHours(0, 0, 0, 0);
 
-      // Convert incoming dates
       const start = new Date(startDate);
       const end = new Date(endDate);
 
-      // Invalid dates
-      if (isNaN(start.getTime()) || isNaN(end.getTime())) {
-        console.log("Invalid trip dates:", startDate, endDate);
-        return "UPCOMING";
-      }
+      if (isNaN(start.getTime()) || isNaN(end.getTime())) return "UPCOMING";
 
-      // Normalize ranges
       start.setHours(0, 0, 0, 0);
       end.setHours(23, 59, 59, 999);
 
-      console.log("Trip Status Debug:");
-      console.log("Today:", today);
-      console.log("Start:", start);
-      console.log("End:", end);
-
-      // Ongoing trip
-      if (today >= start && today <= end) {
-        return "CONTINUING";
-      }
-
-      // Past trip
-      if (today > end) {
-        return "COMPLETED";
-      }
-
-      // Future trip
+      if (today >= start && today <= end) return "CONTINUING";
+      if (today > end) return "COMPLETED";
       return "UPCOMING";
     } catch (err) {
       console.error("Trip status error:", err);
@@ -262,6 +243,7 @@ const Dashboard = () => {
   };
 
   useEffect(() => {
+    // 1. Fetch user specific planned trips
     const fetchTrips = async () => {
       try {
         const res = await api.get("/api/trips");
@@ -270,14 +252,116 @@ const Dashboard = () => {
         console.error("Fetch trips failed:", err);
       }
     };
+
+    // 🚨 2. Fetch AI Recommendations via authenticated api wrapper
+    const fetchAIRecommendations = async () => {
+      try {
+        const res = await api.get("/api/reviews/recommend");
+        console.log("AI Recommendations response:", res.data);
+        setRecs(
+          res.data.recommendations || (Array.isArray(res.data) ? res.data : []),
+        );
+        setFallback(res.data.fallback || false);
+      } catch (err) {
+        console.error("Fetch AI recommendations failed:", err);
+      } finally {
+        setRecsLoading(false);
+      }
+    };
+
     fetchTrips();
+    fetchAIRecommendations();
   }, []);
 
   const selectedGenre = GENRES.find((g) => g.id === activeGenre);
 
   return (
-    <div className="max-w-7xl mx-auto space-y-10 p-4">
-      {/* Explore Sections (Vibes grid) */}
+    <div className="max-w-7xl mx-auto space-y-12 p-4">
+      {/* ================= OPTION 2: AI RECOMMENDATIONS PIPELINE ================= */}
+      <div className="bg-gradient-to-r from-slate-50 to-sky-50/50 p-6 rounded-3xl border border-sky-100/60">
+        <div className="flex items-center gap-2 mb-1">
+          <Sparkles
+            className="text-amber-500 fill-amber-500 animate-spin-slow"
+            size={20}
+          />
+          <h2 className="text-2xl font-bold text-gray-800">
+            Discover Next Places
+          </h2>
+        </div>
+        <p className="text-sm text-gray-500 mb-6">
+          {fallback
+            ? "💡 Popular destinations worldwide — rate more cities to get tailored predictions!"
+            : "🎯 Personalized for you — based on your travel history and community patterns."}
+        </p>
+
+        {recsLoading ? (
+          <div className="text-center py-8 text-sky-600 font-medium animate-pulse flex items-center justify-center gap-2">
+            <Clock size={16} className="animate-spin" /> Finding trips you'll
+            love...
+          </div>
+        ) : recs.length === 0 ? (
+          <div className="text-center py-8 bg-white border border-dashed rounded-2xl border-gray-200">
+            <p className="text-gray-500 text-sm">
+              No recommendations available. Rate at least 2 destinations to
+              kickstart the prediction pipeline!
+            </p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+            {recs.map((rec, i) => {
+              const scorePercent = Math.round((rec.score / 5) * 100);
+              return (
+                <div
+                  key={i}
+                  onClick={() => navigate(`/city/${rec.destination}`)}
+                  className="group cursor-pointer bg-white rounded-2xl p-4 border border-gray-100 shadow-sm hover:shadow-md hover:border-sky-300 transition-all duration-200 flex flex-col justify-between"
+                >
+                  <div>
+                    <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1">
+                      #{i + 1} Best Match
+                    </span>
+                    <h3 className="text-base font-bold text-gray-800 group-hover:text-sky-600 transition-colors truncate mb-2">
+                      {rec.destination}
+                    </h3>
+
+                    {/* Performance Score Bar */}
+                    <div className="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden mb-3">
+                      <div
+                        className="h-full rounded-full transition-all duration-300"
+                        style={{
+                          width: `${scorePercent}%`,
+                          backgroundColor:
+                            scorePercent >= 80
+                              ? "#1D9E75"
+                              : scorePercent >= 60
+                              ? "#BA7517"
+                              : "#D85A30",
+                        }}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col gap-1 mt-2">
+                    <div className="flex items-center gap-1 text-xs font-semibold text-emerald-600">
+                      <Star size={12} fill="currentColor" /> {rec.score}★{" "}
+                      <span className="text-[10px] text-gray-400 font-normal">
+                        match
+                      </span>
+                    </div>
+                    {rec.ratedByCount !== undefined && (
+                      <span className="text-[10px] text-gray-400">
+                        👥 Verified by {rec.ratedByCount} visitors
+                      </span>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+
+      {/* ================= SECTION: EXPLORE VIBES ================= */}
       <div>
         <h2 className="text-2xl font-semibold mb-1">Explore by Interest</h2>
         <p className="text-sm text-gray-400 mb-5">
@@ -337,7 +421,7 @@ const Dashboard = () => {
         )}
       </div>
 
-      {/* Trips Display Section */}
+      {/* ================= SECTION: MY PLANNED TRIPS ================= */}
       <div>
         <h1 className="text-2xl font-bold mb-6">My Trips</h1>
 
@@ -350,16 +434,9 @@ const Dashboard = () => {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {trips.map((trip) => {
-              const startDate = trip.startDate 
-
-              const endDate = trip.endDate 
-
-              console.log("Trip Object:", trip);
-              console.log("Resolved Start:", startDate);
-              console.log("Resolved End:", endDate);
-
+              const startDate = trip.startDate;
+              const endDate = trip.endDate;
               const status = getTripStatus(startDate, endDate);
-
               const cityName =
                 trip.destination?.city || trip.destination || "Unknown City";
               const countryName = trip.destination?.country || "";
@@ -370,23 +447,18 @@ const Dashboard = () => {
                   onClick={() => navigate(`/trip/${trip._id}`)}
                   className="group cursor-pointer bg-white rounded-2xl shadow-sm hover:shadow-md transition-all border border-gray-100 overflow-hidden relative flex flex-col justify-between"
                 >
-                  {/* 🚨 Outer Positioning Layer Container */}
                   <div className="relative w-full h-44 bg-sky-50 flex items-center justify-center group-hover:bg-sky-100 transition-colors">
-                    {/* Status Badges - Raised explicitly using z-30 */}
                     <div className="absolute top-4 left-4 z-[999] flex gap-2">
                       {status === "UPCOMING" && (
                         <div className="bg-blue-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg">
                           UPCOMING
                         </div>
                       )}
-
                       {status === "CONTINUING" && (
                         <div className="bg-green-500 text-white text-xs font-bold px-3 py-1 rounded-full flex items-center gap-1 animate-pulse shadow-lg">
-                          <Clock size={12} />
-                          LIVE NOW
+                          <Clock size={12} /> LIVE NOW
                         </div>
                       )}
-
                       {status === "COMPLETED" && (
                         <div className="bg-gray-800 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg">
                           PAST TRIP
@@ -407,7 +479,6 @@ const Dashboard = () => {
                     <MapPin size={48} className="text-sky-600 opacity-80" />
                   </div>
 
-                  {/* Information Details Container */}
                   <div className="p-5 flex-1 flex flex-col justify-between">
                     <div>
                       <h2 className="text-lg font-bold text-gray-800 truncate mb-1">

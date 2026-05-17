@@ -8,11 +8,11 @@ export const addReview = async (req, res) => {
     const { rating, comment, tags } = req.body;
     const userId = req.user.id;
 
-     if (!rating || !comment) {
-       return res.status(400).json({
-         message: "Rating and comment are required",
-       });
-     }
+    if (!rating || !comment) {
+      return res.status(400).json({
+        message: "Rating and comment are required",
+      });
+    }
 
     // 1. Database se user fetch karo verified profile info ke liye
     const user = await User.findById(userId);
@@ -72,3 +72,107 @@ export const getReviews = async (req, res) => {
   }
 };
 
+
+export const getRecomendPlaces = async (req, res) => {
+  try {
+    // 1. Ensure user session is present
+    if (!req.user || !req.user.id) {
+      return res
+        .status(401)
+        .json({ message: "Unauthorized: Missing user session" });
+    }
+
+    console.log(
+      "User session found, proceeding with recommendations for user:",
+      req.user.id,
+    );
+    const targetUserId = req.user.id.toString();
+
+    // 2. Fetch reviews from Database
+    const allRatings = await Review.find({}, "userId cityId rating");
+
+    // Cold-start protection baseline threshold filter
+    if (allRatings.length < 5) {
+      console.log(
+        `[ML Pipeline] Insufficient dataset (${allRatings.length}/5). Triggering Aggregation Fallback.`,
+      );
+
+      const popular = await Review.aggregate([
+        {
+          $group: {
+            _id: "$cityId",
+            avgRating: { $avg: "$rating" },
+            count: { $sum: 1 },
+          },
+        },
+        { $match: { count: { $gte: 1 } } },
+        { $sort: { avgRating: -1 } },
+        { $limit: 5 },
+      ]);
+
+      console.log("[DEBUG] Aggregation Output Data:", popular);
+      return res.json({
+        recommendations: popular.map((p) => ({
+          destination: p._id,
+          score: p.avgRating ? p.avgRating.toFixed(1) : "0.0",
+          reason: "Popular destination",
+          ratedByCount: p.count,
+        })),
+        fallback: true,
+      });
+    }
+
+    // 🚀 Data serialization & Clean up (Filter out rows with missing IDs)
+    const formatted = allRatings
+      .filter((r) => r.userId && r.cityId && r.rating !== undefined) // 👈 Security check: valid rows only
+      .map((r) => ({
+        user_id: r.userId.toString(),
+        destination: r.cityId.toString(),
+        rating: Number(r.rating),
+      }));
+
+    console.log(
+      `[ML Pipeline] Dispatching ${formatted.length} vectors to Flask SVD service for User: ${targetUserId}`,
+    );
+
+    // 3. Call Flask ML service (Flask URL verification)
+    // Note: Make sure Flask is running on port 5000 (or change port here if it's 5001)
+    const mlRes = await axios.post(
+      "http://localhost:5000/recommend",
+      {
+        ratings: formatted,
+        target_user: targetUserId,
+      },
+      { timeout: 10000 }, // 10 seconds timeout
+    );
+
+    return res.json({
+      recommendations: mlRes.data.recommendations || mlRes.data,
+      fallback: false,
+    });
+  } catch (err) {
+    // 🔥 ENHANCED DEBUG LOGGING FOR AXIOS / NETWORK ERRORS
+    console.error("❌ Recommendation controller pipeline failed!");
+
+    if (err.response) {
+      // Flask server responded with an error status (4xx, 5xx)
+      console.error(`[Flask Error Status]: ${err.response.status}`);
+      console.error(`[Flask Error Data]:`, err.response.data);
+    } else if (err.request) {
+      // Request was made but no response was received (Flask is likely DOWN)
+      console.error(
+        "[Network Error]: No response received from Flask server. Is it running on port 5000?",
+      );
+    } else {
+      // Something else triggered the error
+      console.error(`[Error Message]: ${err.message}`);
+    }
+
+    // Smooth error response to frontend
+    return res.status(500).json({
+      error: "Recommendation service temporarily offline",
+      details:
+        err.response?.data?.message || err.message || "Connection timeout",
+    });
+  }
+};

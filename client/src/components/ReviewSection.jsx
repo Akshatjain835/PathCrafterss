@@ -20,7 +20,6 @@ export default function ReviewSection({ cityId }) {
         `http://localhost:5001/api/reviews/${cityId}`,
       );
       setReviews(res.data);
-      console.log("revies are: ", res.data);
     } catch (err) {
       console.error("Error fetching reviews", err);
     } finally {
