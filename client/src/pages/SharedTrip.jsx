@@ -49,6 +49,7 @@ const CSS = `
 `;
 
 export default function SharedTrip() {
+  const isLoggedIn = !!localStorage.getItem("token");
   const { token } = useParams();
   const [trip,    setTrip]    = useState(null);
   const [loading, setLoading] = useState(true);
@@ -186,7 +187,7 @@ export default function SharedTrip() {
           <p style={{ color: "#6B7280", fontSize: 14, marginBottom: 16 }}>
             Inspired? Plan your own trip with AI on PathCrafters.
           </p>
-          <Link to="/signup" className="st-cta-btn">
+          <Link to={isLoggedIn ? "/dashboard" : "/signup"} className="st-cta-btn">
             <Plane size={15} />
             Start planning for free
           </Link>

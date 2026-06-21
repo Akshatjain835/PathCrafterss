@@ -146,7 +146,7 @@ Rules:
       `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
       {
         contents: [{ parts: [{ text: prompt }] }],
-        generationConfig: { temperature: 0.6, maxOutputTokens: 3000 },
+        generationConfig: { temperature: 0.6, maxOutputTokens: 8192 },
       }
     );
 

@@ -7,6 +7,7 @@ app = Flask(__name__)
 
 @app.route('/recommend', methods=['POST'])
 def recommend():
+    print("Recommendation request received")
     try:
         data = request.json
         ratings_raw = data.get('ratings', [])
@@ -94,4 +95,5 @@ def recommend():
 
 
 if __name__ == '__main__':
-    app.run(port=5000, debug=True)
+    print("Flask Recommendation Service started on port 5001")
+    app.run(port=5002, debug=True)

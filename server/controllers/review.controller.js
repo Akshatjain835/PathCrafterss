@@ -137,8 +137,9 @@ export const getRecomendPlaces = async (req, res) => {
 
     // 3. Call Flask ML service (Flask URL verification)
     // Note: Make sure Flask is running on port 5000 (or change port here if it's 5001)
+    const url = "http://127.0.0.1:5002/recommend";
     const mlRes = await axios.post(
-      "http://localhost:5000/recommend",
+      url,
       {
         ratings: formatted,
         target_user: targetUserId,
