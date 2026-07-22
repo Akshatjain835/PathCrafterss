@@ -23,7 +23,7 @@ app.use(cors({
   origin: (origin, callback) => {
     // allow requests with no origin (like curl or some mobile apps)
     if (!origin) return callback(null, true);
-    const allowedOrigins = [process.env.FRONTEND_URL || "http://localhost:5173", "http://localhost:5174"];
+    const allowedOrigins = [process.env.CLIENT_URL || "http://localhost:5173", "http://localhost:5174"];
     if (allowedOrigins.includes(origin)) return callback(null, true);
     return callback(new Error('CORS policy: Origin not allowed'));
   },
