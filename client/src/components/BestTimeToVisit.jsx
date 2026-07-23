@@ -11,7 +11,7 @@ import {
   CalendarCheck,
   AlertTriangle,
 } from "lucide-react";
-
+import api from "@/features/auth/authAPI";
 const MONTH_NAMES = [
   "Jan",
   "Feb",
@@ -33,8 +33,8 @@ export default function BestTimeToVisit({ destination }) {
 
   useEffect(() => {
     if (!destination) return;
-    axios
-      .get(`http://localhost:5001/api/climate/${destination}`)
+    
+      api.get(`/api/climate/${destination}`)
       .then((res) => {
         setData(res.data);
         setLoading(false);
