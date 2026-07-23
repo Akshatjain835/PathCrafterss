@@ -28,8 +28,8 @@ With PathCrafterss, users can:
 
 ## 🌐 Demo
 
-- **Frontend:** https://your-frontend-url.vercel.app
-- **Backend API:** https://your-backend-url.onrender.com
+- **Frontend:** https://pathcrafterss-2.onrender.com
+- **Backend API:** https://pathcrafterss-1.onrender.com
 
 ---
 
