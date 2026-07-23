@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Star, Send, User } from "lucide-react";
+import api from "@/features/auth/authAPI"
 
 export default function ReviewSection({ cityId }) {
   const [reviews, setReviews] = useState([]);
@@ -16,9 +17,7 @@ export default function ReviewSection({ cityId }) {
 
   const fetchReviews = async () => {
     try {
-      const res = await axios.get(
-        `http://localhost:5001/api/reviews/${cityId}`,
-      );
+      const res = await api.get(`/api/reviews/${cityId}`);
       setReviews(res.data);
     } catch (err) {
       console.error("Error fetching reviews", err);
@@ -37,8 +36,8 @@ export default function ReviewSection({ cityId }) {
     setIsSubmitting(true);
 
     try {
-      const res = await axios.post(
-        `http://localhost:5001/api/reviews/${cityId}`,
+      const res = await api.post(
+        `/api/reviews/${cityId}`,
         {
           rating,
           comment,
