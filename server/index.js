@@ -1,5 +1,7 @@
-import express from "express";
 import dotenv from "dotenv";
+
+dotenv.config();
+import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import { connectDB } from "./config/connectDB.js";
@@ -11,7 +13,6 @@ import "./cron/refreshClimate.js";
 import reviewRoutes from "./routes/review.route.js";
 import cityRoutes from "./routes/city.route.js";
 
-dotenv.config();
 
 const app = express();
 
